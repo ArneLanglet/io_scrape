@@ -4,6 +4,7 @@
 library(rvest)
 library(tidyverse)
 library(data.table)
+library(httr)
 
 ### ------------------------------------------------------------------------ ###
 ##
@@ -14,8 +15,9 @@ httr::set_config(httr::user_agent("arne.langlet@univie.ac.at;  maripoldata.eu"))
 #
 ### ------------------------------------------------------------------------ ###
 
-length(url_list)
-url_list
+
+url_list <- url_list[-25]
+
 # number of pages to scrape
 npages <- as.integer(length(url_list))
 
@@ -32,7 +34,7 @@ for (i in 1:npages) {
   # setTxtProgressBar(pb, i)
   
   # build file name
-  file.name <- paste0("./io_cooperation/isa_page", i, "---", Sys.Date(), ".html")
+  file.name <- paste0("./io_cooperation/unep_page", i, "---", Sys.Date(), ".html")
   
   # avoid re-downloading by checking for files before downloading
   if (file.exists(file.name)) {
@@ -44,34 +46,30 @@ for (i in 1:npages) {
     page <- read_html(tmp)
   }
   # extract data
-  titles <- page %>%
-    html_nodes(".page-title") %>%
-    html_text(trim = T)
-  
-  links <- page %>% 
-    html_nodes('.field a') %>% 
-    html_attr("href")
-  
-  texts <- page %>% 
-    html_nodes(".field__item") %>% 
-    html_text(trim=T)
-  
-  # metadata <- page %>%
-  #   html_nodes(".meta") %>%
-  #   html_text(trim = T) %>%
-  #   str_replace('\\|', '-splithere-') %>%
-  #   str_split('-splithere-') %>%
-  #   map(str_trim)
-  # # 
-  # dates <- metadata %>%
-  #   map_chr(1)
-  # 
-  # authors <- metadata %>% 
-  #   map_chr(2)
-  # 
-  # excerpts <- page %>% 
-  #   html_nodes(".mh-excerpt") %>%
+  ## for url [25]
+  # titles <- page %>%
+  #   html_nodes(".font-bold") %>% 
   #   html_text(trim = T)
+  # 
+  # links <- page %>% 
+  #   html_nodes('.max-w-8xl a') %>% 
+  #   html_attr("href")
+  # 
+  # texts <- page %>% 
+  #   html_nodes(".max-w-8xl") %>% 
+  #   html_text(trim=T)
+  
+  titles <- page %>%
+    html_nodes(".article_header_meta_wrap") %>%
+    html_text(trim = T)
+
+  links <- page %>%
+    html_nodes('.content_wrap a') %>%
+    html_attr("href")
+
+  texts <- page %>%
+    html_nodes(".content_wrap") %>%
+    html_text(trim=T)
   
   # plow data into dataframe
   df <- data.frame(
@@ -80,12 +78,13 @@ for (i in 1:npages) {
     # byline = authors,
     #  excerpt = excerpts,
     link = paste(links[grepl("https", links)], collapse = ", "),
-    text = texts[5]
+    text = texts
   )
   
   # put page 'i' dataframe into the list
   dfs[[i]] <- df
 }
+
 
 
 # stack all page dataframes together
@@ -97,6 +96,5 @@ out$collection_date <- Sys.Date()
 
 out$text <- str_to_lower(out$text)
 
-out$text
-write.csv(out, file = "out_isa.csv")
+write.csv(out, file = "out_unep.csv")
 

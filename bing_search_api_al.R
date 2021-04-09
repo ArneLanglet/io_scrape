@@ -97,3 +97,30 @@ convert <- rawToChar(response$content)
 output <- fromJSON(convert)
 
 url_list <- output$webPages$value$url
+
+
+
+#### UNEP
+query <- list(
+  q = c("news site:https://www.unep.org/news-and-stories/"),
+  count = 50)
+# url <- "https://api.cognitive.microsoft.com"
+# path <- "bing/v7.0/search"
+# query <- list(
+#   q = "aarhus site:dr.dk"
+# )
+
+response <- GET(url = url,
+                add_headers('Ocp-Apim-Subscription-Key' = key),
+                query = query)
+
+
+http_type(response)
+
+headers(response)
+
+convert <- rawToChar(response$content)
+output <- fromJSON(convert)
+
+url_list <- output$webPages$value$url
+
