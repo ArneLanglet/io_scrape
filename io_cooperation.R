@@ -6,40 +6,20 @@ library(jsonlite)
 library(tidyverse)
 library(stringr)
 library(plyr)
+library(readxl)
 
 # clean environment
 rm(list = ls())
 
-io <- str_to_lower(c("ioc", "isa", "imo", "cbd", "unep", "fao"))
-io <- sort(io)
-igo <-       str_to_lower(c("NEAFC", "ISA", 
-                            "HELCOM", "CPPS", "NAFO",
-                            "NPFC","OSPAR", "SPREP", "WCPFC", "AALCO",
-                            "ICES", "Commonwealth", "Iccat", "SPC", "IPBES", "IATTC", "Medfund", "GCF", "SEAFO",
-                            "Pacific Island Forum", "SICA", "WTO", "Nauru Agreement", "ILO", "IWC", "ATS",
-                            "Benguela", "PEMSEA", "IPCC", "CCAMLR", "APFIC",
-                            "GLFC", "IOTC", "IPHC", "NASCO", "PSC",
-                            "SEAFDEC", "NACA", "PICES", "IAEA", "WMO", "world bank","UNIDO", "UNSD", "UNCLOS", "UNDESA", 
-                            "UNECE", "UNFCCC", "UNEP", "UNDP", "UNFF", "Commission on the limits of the continental shelf",
-                            "ITLOS", "GESAMP", "CMS", "Abidjan", "Minamata","CBD", "cites", "Barcelona convention",
-                            "FAO", "WIPO", "IMO", "IOC", "GFCM", "GEF", "the WHO"))
 
-igo <- sort(igo)
+actors <- read_excel("actors.xlsx")
 
-url_list_fao <- read.csv("url_list_fao.csv")
-url_list_cbd <- read.csv("url_list_cbd.csv")
-url_list_imo <- read.csv("url_list_imo.csv")
-url_list_ioc <- read.csv("url_list_ioc.csv")
-url_list_isa <- read.csv("url_list_isa.csv")
-url_list_unep <- read.csv("url_list_unep.csv")
+igo <- actors$actor
 
 
-url_list_total <- rbind(url_list_cbd, url_list_fao, url_list_imo, url_list_ioc, url_list_isa, url_list_unep)
-
-nrow(url_list_total)
 
 #################### IOC
-ioc <- read.csv("out_ioc.csv")
+ioc <- read.csv("out_icmbio.csv")
 DT <- as.data.table(ioc)
 #text
 x <- c()
@@ -51,16 +31,15 @@ for (i in igo){ x = c(x, igo = length(grep(i, DT$link)))}
 df_ioc2 <- data.frame(ioc2 = matrix(unlist(x), nrow=length(x), byrow=T))
 
 df_ioc <- cbind(df_ioc1, df_ioc2)
-df_ioc <- df_ioc %>% mutate(ioc = ioc1 + ioc2) %>% select(ioc)
-row.names(df_ioc) <- igo
+df_ioc <- df_ioc %>% mutate(icmbio = ioc1 + ioc2) %>% select(icmbio)
 
 
-df_ioc_s <- df_ioc
-paste0
-i <- "ioc"
+row.names(df_ioc) <- make.names(igo, unique = TRUE)
 
 
-grep(paste("\\b",i,"\\b"), DT$text)
+
+
+
 
 ########################### ISA
 isa <- read.csv("out_isa.csv")
